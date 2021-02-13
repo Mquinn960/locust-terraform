@@ -1,4 +1,4 @@
 module "locust" {
-  source        = "./tfmodules/locust"
-  worker_scale  = 3
+  source       = "./tfmodules/locust"
+  worker_scale = 3
 }
