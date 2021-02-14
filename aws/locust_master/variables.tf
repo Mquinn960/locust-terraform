@@ -2,6 +2,7 @@ variable "name" {}
 variable "subnet_id" {}
 variable "vpc_id" {}
 variable "project_tag" {}
+variable "project" {}
 variable "ssh_key_name" {}
 
 # Master config
@@ -20,3 +21,5 @@ variable "master_instance_type" {
 variable "master_ami" {
     default = "ami-098828924dc89ea4a"
 }
+
+variable "locustfile_web_link" {}

@@ -22,17 +22,69 @@ resource "aws_security_group_rule" "allow_locust_ui_external" {
     from_port = 8089
     to_port = 8089
     protocol = "tcp"
-    cidr_blocks = [file("../shared/mq_pub_ip.txt")]
+    # cidr_blocks = [file("../shared/mq_pub_ip.txt")]
+    cidr_blocks = ["0.0.0.0/0"]
     security_group_id = aws_security_group.locust_master.id
 }
 
-resource "aws_security_group_rule" "allow_cluster_chatter" {
+resource "aws_security_group_rule" "allow_cluster_chatter_out" {
     type = "egress"
     from_port = 5557
     to_port = 5558
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     security_group_id = aws_security_group.locust_master.id
+}
+
+resource "aws_security_group_rule" "allow_cluster_chatter_in" {
+    type = "ingress"
+    from_port = 5557
+    to_port = 5558
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_master.id
+}
+
+resource "aws_security_group_rule" "http_out" {
+    type = "egress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_master.id
+}
+
+resource "aws_security_group_rule" "http_in" {
+    type = "ingress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_master.id
+}
+
+resource "aws_security_group_rule" "https_out" {
+    type = "egress"
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_master.id
+}
+
+resource "aws_security_group_rule" "https_in" {
+    type = "ingress"
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_master.id
+}
+
+locals {
+  userdata_script  = templatefile("resources/locust_master.sh", {
+        locustfile_web_link = var.locustfile_web_link
+  })
 }
 
 resource "aws_instance" "locust_master" {
@@ -44,6 +96,9 @@ resource "aws_instance" "locust_master" {
     associate_public_ip_address = true
 
     tags = {
-        Name = var.project_tag
+        Name = "${var.project}_master"
     }
+
+    user_data                   = local.userdata_script
+
 }

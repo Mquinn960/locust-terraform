@@ -17,8 +17,17 @@ resource "aws_security_group_rule" "allow_locust" {
     security_group_id = aws_security_group.locust_worker.id
 }
 
-resource "aws_security_group_rule" "allow_cluster_chatter" {
+resource "aws_security_group_rule" "allow_cluster_chatter_in" {
     type = "ingress"
+    from_port = 5557
+    to_port = 5558
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_worker.id
+}
+
+resource "aws_security_group_rule" "allow_cluster_chatter_out" {
+    type = "egress"
     from_port = 5557
     to_port = 5558
     protocol = "tcp"
@@ -35,6 +44,58 @@ resource "aws_security_group_rule" "allow_external_egress" {
     security_group_id = aws_security_group.locust_worker.id
 }
 
+resource "aws_security_group_rule" "allow_ssh" {
+    type = "ingress"
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_worker.id
+}
+
+resource "aws_security_group_rule" "http_out" {
+    type = "egress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_worker.id
+}
+
+resource "aws_security_group_rule" "http_in" {
+    type = "ingress"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_worker.id
+}
+
+resource "aws_security_group_rule" "https_out" {
+    type = "egress"
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_worker.id
+}
+
+resource "aws_security_group_rule" "https_in" {
+    type = "ingress"
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.locust_worker.id
+}
+
+locals {
+  userdata_script  = templatefile("resources/locust_worker.sh", {
+      locustfile_web_link = var.locustfile_web_link
+      master_hostname = var.master_hostname[0]
+    })
+}
+
 resource "aws_instance" "locust_worker" {
     ami              = var.worker_ami
     instance_type    = var.worker_instance_type
@@ -44,8 +105,9 @@ resource "aws_instance" "locust_worker" {
     count            = var.worker_scale
 
     tags = {
-        Name = var.project_tag
+        Name = "${var.project}_worker_${count.index}"
     }
 
-    # userdata = ["locust", "-f", "/mnt/locust/locustfile.py", "--worker", "--master-host", "locust-master"]
+    user_data        = local.userdata_script    
+
 }

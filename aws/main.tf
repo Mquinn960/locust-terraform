@@ -1,37 +1,43 @@
 module "network" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name               = var.project_tag
-  cidr               = "10.10.0.0/16"
-  azs                = ["eu-west-2a"]
-  public_subnets     = ["10.10.0.0/24"]
-  enable_dns_support = true
+  name                 = var.project_tag
+  cidr                 = "10.10.0.0/16"
+  azs                  = ["eu-west-2a"]
+  public_subnets       = ["10.10.0.0/24"]
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 }
 
 module "locust_master" {
-  source          = "./locust_master"
+  source                = "./locust_master"
 
-  name            = var.project
-  subnet_id       = element(module.network.public_subnets, 0)
-  vpc_id          = module.network.vpc_id
+  name                  = var.project
+  subnet_id             = element(module.network.public_subnets, 0)
+  vpc_id                = module.network.vpc_id
 
-  master_host     = var.master_host
-  endpoint_host   = var.endpoint_host
-  ssh_key_name    = var.ssh_key_name
+  master_host           = var.master_host
+  endpoint_host         = var.endpoint_host
+  ssh_key_name          = var.ssh_key_name
+  locustfile_web_link   = var.locustfile_web_link
 
-  project_tag     = var.project_tag
+  project               = var.project
+  project_tag           = var.project_tag
 }
 
 module "locust_worker" {
-  source          = "./locust_worker"
+  source                = "./locust_worker"
 
-  name            = var.project
-  subnet_id       = element(module.network.public_subnets, 0)
-  vpc_id          = module.network.vpc_id
+  name                  = var.project
+  subnet_id             = element(module.network.public_subnets, 0)
+  vpc_id                = module.network.vpc_id
 
-  worker_scale    = var.worker_scale
-  master_host     = var.master_host
-  ssh_key_name    = var.ssh_key_name
+  worker_scale          = var.worker_scale
+  master_host           = var.master_host
+  ssh_key_name          = var.ssh_key_name
+  locustfile_web_link   = var.locustfile_web_link
+  master_hostname       = module.locust_master.master_public_dns
 
-  project_tag     = var.project_tag
+  project               = var.project
+  project_tag           = var.project_tag
 }

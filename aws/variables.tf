@@ -22,7 +22,8 @@ variable "endpoint_host" {
 }
 
 variable "worker_scale" {
-  default = 2
+  default = 1
 }
 
 variable "ssh_key_name" {}
+variable "locustfile_web_link" {}
