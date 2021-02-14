@@ -27,3 +27,5 @@ variable "locustfile_web_link" {}
 variable "master_hostname" {
     type = list
 }
+
+variable "cluster_cidr" {}

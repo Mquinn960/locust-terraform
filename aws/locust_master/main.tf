@@ -13,7 +13,7 @@ resource "aws_security_group_rule" "allow_ssh" {
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [file("../shared/mq_pub_ip.txt")]
     security_group_id = aws_security_group.locust_master.id
 }
 
@@ -22,26 +22,25 @@ resource "aws_security_group_rule" "allow_locust_ui_external" {
     from_port = 8089
     to_port = 8089
     protocol = "tcp"
-    # cidr_blocks = [file("../shared/mq_pub_ip.txt")]
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [file("../shared/mq_pub_ip.txt")]
     security_group_id = aws_security_group.locust_master.id
 }
 
 resource "aws_security_group_rule" "allow_cluster_chatter_out" {
     type = "egress"
     from_port = 5557
-    to_port = 5558
+    to_port = 5557
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.cluster_cidr]
     security_group_id = aws_security_group.locust_master.id
 }
 
 resource "aws_security_group_rule" "allow_cluster_chatter_in" {
     type = "ingress"
     from_port = 5557
-    to_port = 5558
+    to_port = 5557
     protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.cluster_cidr]
     security_group_id = aws_security_group.locust_master.id
 }
 
@@ -84,6 +83,7 @@ resource "aws_security_group_rule" "https_in" {
 locals {
   userdata_script  = templatefile("resources/locust_master.sh", {
         locustfile_web_link = var.locustfile_web_link
+        mock_hostname = var.mock_hostname[0]
   })
 }
 

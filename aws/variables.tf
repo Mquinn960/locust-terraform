@@ -25,5 +25,13 @@ variable "worker_scale" {
   default = 1
 }
 
-variable "ssh_key_name" {}
 variable "locustfile_web_link" {}
+
+# Mockserver
+variable "mock_hostname" {
+  default = "mock-server"
+}
+
+variable "mockserver_init_web_link" {}
+
+variable "ssh_key_name" {}

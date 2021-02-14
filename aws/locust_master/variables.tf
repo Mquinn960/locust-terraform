@@ -23,3 +23,10 @@ variable "master_ami" {
 }
 
 variable "locustfile_web_link" {}
+
+variable "cluster_cidr" {}
+
+# Mockserver
+variable "mock_hostname" {
+  default = "mock-server"
+}
