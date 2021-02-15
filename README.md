@@ -30,3 +30,36 @@ Then, you can aim your requests at http://mock-server:1080 to
 begin load testing.
 
 ## AWS
+
+This Terraform stack contains a main build which creates
+a shared VPC, before provisioning Locust master and workers as
+well as a MockServer endpoint for live load-testing.
+
+This stack allows for a dynamic number of Locust worker nodes
+by configuring the ```terraform.tfvars``` config file and
+altering the ```worker_scale``` parameter.
+
+### Prerequisites
+
+In order to successfully deploy to your own AWS account, you must
+first ensure the following steps have been completed:
+
+- Install Terraform
+  - Ensure this is present on your PATH
+- Install the AWS CLI
+  - Ensure this is present on your PATH
+  - Run ```aws configure``` and add your desired access key(s)
+    which will be used for configuration
+
+### Running the Stack
+
+- ```cd aws```
+  - Move to the AWS stack folder
+- ```terraform init```
+  - Install required TF modules from their respective definitions
+- ```terraform plan```
+  - Outline the plan for creating the AWS stack (for validation)
+- ```terraform apply```
+  - Apply the config to create this demo resource on AWS
+  - Respond ```yes``` in order to instantiate the configuration
+
